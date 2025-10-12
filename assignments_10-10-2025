@@ -164,6 +164,14 @@ order by rn;
 
 
 
+
+
+
+12/10/25
+
+
+
+
 --## 📊 B. Analytical / Window Functions (30 Questions)
 
 --1. Assign row numbers to customers ordered by credit limit descending.  
