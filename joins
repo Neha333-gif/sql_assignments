@@ -1,0 +1,97 @@
+
+1> inner join
+
+select c.CustomerID, c.CustomerName, p.ProductName
+from Customer c
+inner join product p
+on c.customerID = p.CustomerID;
+
+// remove the row which doesn't has a match
+
+CustomerID CustomerName	ProductName
+1	John Smith	Laptop
+1	John Smith	Smartphone
+2	Priya Sharma	Tablet
+3	Carlos Mendez	Watch
+2	Priya Sharma	Camera
+4	Aisha Khan	Shoes
+4	Aisha Khan	Backpack
+
+
+
+2> left outer join and left join
+
+select c.CustomerID, c.CustomerName, p.ProductName
+from Customer c
+left outer join product p
+on c.CustomerID = p.CustomerID;
+
+// if there is no match then replace it with null
+
+CustomerID CustomerName	ProductName
+1	John Smith	Laptop
+1	John Smith	Smartphone
+2	Priya Sharma	Camera
+2	Priya Sharma	Tablet
+3	Carlos Mendez	Watch
+4	Aisha Khan	Backpack
+4	Aisha Khan	Shoes
+5	Liam Brown	
+
+
+3> right outer join and right join
+
+
+select c.CustomerID, c.CustomerName, p.ProductName
+from Customer c
+right outer join product p
+on c.customerID = p.CustomerID;
+
+CustomerID	CustomerName	ProductName
+1	       John Smith	Laptop
+1	       John Smith	Smartphone
+2	       Priya Sharma	Tablet
+2	       Priya Sharma	Camera
+3	       Carlos Mendez	Watch
+4	       Aisha Khan	Shoes
+4	       Aisha Khan	Backpack
+                	       Headphones
+
+
+
+4> full outer join
+
+select c.CustomerID, c.CustomerName, p.ProductName
+from Customer c
+full outer join product p
+on c.customerID = p.CustomerID;
+
+| CustomerID | CustomerName  | ProductName |
+| ---------- | ------------- | ----------- |
+| 1          | John Smith    | Laptop      |
+| 1          | John Smith    | Smartphone  |
+| 2          | Priya Sharma  | Tablet      |
+| 2          | Priya Sharma  | Camera      |
+| 3          | Carlos Mendez | Watch       |
+| 4          | Aisha Khan    | Shoes       |
+| 4          | Aisha Khan    | Backpack    |
+| 5          | Liam Brown    |             |
+|            |               | Headphones  |
+
+
+5> symmetric difference
+
+   select c.CustomerID, c.CustomerName, p.ProductName
+from Customer c
+full outer join Product p
+on c.CustomerID = p.CustomerID
+where c.CustomerID is null or p.CustomerID is null;
+
+
+
+
+| CustomerID | CustomerName | ProductName |
+| ---------- | ------------ | ----------- |
+| 5          | Liam Brown   |             |
+|            |              | Headphones  |
+
