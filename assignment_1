@@ -1,0 +1,243 @@
+-- 1. Find customers born after the year 1990.--
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_GENDER,
+    CUST_YEAR_OF_BIRTH
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_YEAR_OF_BIRTH > '1990';
+
+-- 2. List all male customers (`CUST_GENDER = 'M'`).--
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_GENDER
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_GENDER = 'M';
+
+-- 3. Retrieve all female customers (`CUST_GENDER = 'F'`) living in Sydney. 
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_GENDER,
+    CUST_CITY,
+    CUST_STATE_PROVINCE
+FROM
+    SH.CUSTOMERS
+WHERE
+        CUST_CITY = 'Sydney'
+    AND CUST_GENDER = 'F';
+
+-- 4.Find customers with income level `"G: 130,000 - 149,999"`.
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_INCOME_LEVEL
+FROM
+    SH.CUSTOMERS
+WHERE
+        CUST_GENDER = 'F'
+    AND CUST_INCOME_LEVEL = 'G: 130,000 - 149,999';
+
+-- 5.Get all customers with a credit limit above 10,000.
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_CREDIT_LIMIT
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_CREDIT_LIMIT > '10000';
+
+-- 6. Retrieve customers from the state "California".
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_STATE_PROVINCE
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_STATE_PROVINCE = 'CA';
+
+-- 7. Find customers who have provided an email address.
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_EMAIL
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_EMAIL IS NOT NULL;
+
+-- 8. List customers with missing marital status.
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_MARITAL_STATUS
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_MARITAL_STATUS IS NULL;
+
+-- 9. Find customers whose postal code starts with "53".
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_POSTAL_CODE
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_POSTAL_CODE LIKE '53%';
+
+-- 10. Get customers born before 1980 with a credit limit above 5,000.
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_YEAR_OF_BIRTH,
+    CUST_CREDIT_LIMIT
+FROM
+    SH.CUSTOMERS
+WHERE
+        CUST_YEAR_OF_BIRTH < '1980'
+    AND CUST_CREDIT_LIMIT > '5000';
+
+--11. Retrieve customers from Almere or Amersfoort.
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_CITY
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_CITY = 'Almere'
+    OR CUST_CITY = 'Amersfoort';
+
+-- 12. Find customers who do not have a credit limit.
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_CREDIT_LIMIT
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_CREDIT_LIMIT IS NULL;
+-- error -> has no output
+
+-- 13. List customers whose phone number starts with "487".
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_MAIN_PHONE_NUMBER
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_MAIN_PHONE_NUMBER LIKE '487%';
+
+/*
+14. Find married customers with income level `"Medium"`.
+
+select cust_id, cust_first_name, cust_last_name, cust_income_level, cust_marital_status
+from sh.customers where cust_marital_status = 'married' and cust_income_level like 'G:%' ;
+-- error
+*/
+
+-- 15. Get customers whose last name starts with "G".
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_LAST_NAME LIKE 'G%';
+
+ --16. Find customers with city_id = 51057.
+
+SELECT
+    CUST_ID,
+    CUST_FIRST_NAME,
+    CUST_LAST_NAME,
+    CUST_CITY_ID
+FROM
+    SH.CUSTOMERS
+WHERE
+    CUST_CITY_ID = '51057';
+
+-- 17. Retrieve all customers who are valid (`CUST_VALID = 'A'`).
+
+select cust_id, cust_first_name, cust_last_name, cust_valid, cust_eff_from from 
+sh.customers where cust_valid = 'A'; 
+
+
+--18. Find customers whose effective start date (`CUST_EFF_FROM`) is after 2020.
+
+--select cust_id, cust_first_name, cust_last_name, cust_eff_from from 
+--sh.customers where cust_eff_from > to_date('31/12/2020, 12:00:00 AM', 'DD/MM/YYYY, HH:MI:SS AM'); 
+
+
+
+--19. Retrieve customers whose effective end date (`CUST_EFF_TO`) is before 2021.
+
+-- 20. Find customers with credit limit between 5,000 and 9,000.
+
+select cust_id, cust_first_name, cust_last_name, cust_credit_limit from sh.customers 
+where cust_credit_limit between 5000 and 9000 ;
+
+-- 21. Get all customers from country_id = 101.
+
+--select cust_id, cust_first_name, cust_last_name, country_id from sh.customers 
+--where country_id is not nul;
+
+
+--22. Find customers whose email ends with `"@company.example.com"`.
+
+select cust_id, cust_first_name, cust_last_name, cust_email from sh.customers 
+where cust_email like '%@company.example.com' ;
+
+
+--23. List customers with `CUST_TOTAL_ID = 52772`.
+
+select cust_id, cust_first_name, cust_last_name, cust_total_id, cust_eff_from from 
+sh.customers where cust_total_id = '52772'; 
+
+
+-- 24. Find customers with `CUST_SRC_ID` in (10, 20, 30).
+
+select cust_id, cust_first_name, cust_last_name, cust_src_id from 
+sh.customers where cust_src_id is null;
+
+--25. Retrieve customers who either do not have email or do not have a credit LIMIT.
+
+select cust_id, cust_first_name, cust_last_name, cust_email, cust_credit_limit from 
+sh.customers where cust_email is null or cust_credit_limit is null ;
