@@ -241,3 +241,132 @@ sh.customers where cust_src_id is null;
 
 select cust_id, cust_first_name, cust_last_name, cust_email, cust_credit_limit from 
 sh.customers where cust_email is null or cust_credit_limit is null ;
+
+
+--# 25 Questions on GROUP BY and HAVING
+
+--26. Count the number of customers in each city.
+select cust_city, count(*) as cust_count from sh.customers
+group by cust_city order by cust_count desc ;
+
+
+--27. Find cities with more than 100 customers.
+
+select cust_city, count(*) as cust_count from sh.customers 
+group by cust_city having cust_count > 100 order by cust_count asc;
+
+--28. Count the number of customers in each state.
+
+select cust_state_province, count(*) as cust_state from sh.customers 
+group by cust_state_province order by cust_state desc;
+
+
+--29. Find states with fewer than 50 customers.
+
+select cust_state_province, count(*) as cust_state from sh.customers
+ having cust_state < 50 group by cust_state_province order by cust_state desc; 
+
+--30. Calculate the average credit limit of customers in each city.
+
+select cust_city, avg(cust_credit_limit) as cust_credit from sh.customers 
+where cust_credit_limit is not null group by cust_city order by cust_credit asc;
+
+
+
+--31. Find cities with average credit limit greater than 8,000.
+
+select cust_city, avg(cust_credit_limit) as cust_credit from sh.customers 
+having cust_credit > '8000' group by cust_city order by cust_credit desc;
+
+
+--32. Count customers by marital status.
+select cust_marital_status, count(*) as cust_marital from sh.customers
+group by cust_marital_status order by cust_marital desc;
+
+--33. Find marital statuses with more than 200 customers.
+select cust_marital_status, count(*) as cust_marital from sh.customers 
+group by cust_marital_status having cust_marital > 200 order by cust_marital desc;
+
+--34. Calculate the average year of birth grouped by gender.
+
+select cust_gender, avg(cust_year_of_birth) as cust_avg_birth from sh.customers 
+group by cust_gender order by cust_avg_birth asc;
+
+--35. Find genders with average year of birth after 1990.
+
+select cust_gender, avg(cust_year_of_birth) as cust_birth from sh.customers 
+group by cust_gender having cust_birth > 1990 order by cust_birth desc;
+
+
+--36. Count the number of customers in each country.
+select country_id, count(*) as cust_country from sh.customers 
+group by country_id order by cust_country asc;
+
+
+--37. Find countries with more than 1,000 customers.
+select country_id , count(*) as cust_count from sh.customers 
+group by country_id having cust_count > 1000 order by cust_count desc;
+
+
+--38. Calculate the total credit limit per state.
+select cust_state_province, sum(cust_credit_limit) as cust_add from sh.customers 
+group by cust_state_province order by cust_add desc;
+
+--39. Find states where the total credit limit exceeds 100,000.
+select cust_state_province, sum(cust_credit_limit) as cust_limit from sh.customers 
+group by cust_state_province having cust_limit > 100000 order by cust_limit desc;
+
+
+--40. Find the maximum credit limit for each income level.
+select cust_income_level, max(cust_credit_limit) as cust_max from sh.customers 
+group by cust_income_level order by cust_max desc;
+
+--41. Find income levels where the maximum credit limit is greater than 15,000.
+select cust_income_level, max(cust_credit_limit) as max_limit from sh.customers 
+group by cust_income_level having max_limit > 15000 order by max_limit desc;
+ 
+--42. Count customers by year of birth.
+select cust_year_of_birth, count(*) as by_birth from sh.customers 
+group by cust_year_of_birth order by by_birth desc;
+
+--43. Find years of birth with more than 50 customers.
+select cust_year_of_birth, count(*) as birth_count from sh.customers 
+group by cust_year_of_birth having birth_count > 50 order by birth_count desc;
+
+--44. Calculate the average credit limit per marital status.
+select cust_marital_status, avg(cust_credit_limit) as avg_marital from sh.customers 
+group by cust_marital_status order by avg_marital desc;
+
+--45. Find marital statuses with average credit limit less than 5,000.
+select cust_marital_status, avg(cust_credit_limit) as credit_marital from sh.customers 
+group by cust_marital_status having credit_marital < 5000 order by credit_marital asc;
+
+
+--46. Count the number of customers by email domain (e.g., `company.example.com`).
+
+select substr(cust_email, instr(cust_email,'@')+1) as email_domain,
+count(*) as custom_mail from sh.customers group by email_domain 
+order by custom_mail desc;
+
+
+--47. Find email domains with more than 300 customers.
+
+select substr(cust_email, instr(cust_email,'@')+1) as email_domain,
+count(*) as custom_mails from sh.customers group by email_domain
+having custom_mails > 300 order by custom_mails desc;
+
+--48. Calculate the average credit limit by validity (`CUST_VALID`).
+
+select cust_valid, avg(cust_credit_limit) as cust_limit from sh.customers
+group by cust_valid order by cust_limit desc; 
+
+
+--49. Find validity groups where the average credit limit is greater than 7,000.
+
+select cust_valid, avg(cust_credit_limit) as cust_limit from sh.customers
+group by cust_valid having cust_limit > 7000 order by cust_limit desc;
+
+--50. Count the number of customers per state and city combination where there are more than 50 customers.
+
+select cust_state_province, cust_city , count(*) as cust_popul from sh.customers 
+group by cust_state_province, cust_city  having cust_popul > 50 order by cust_popul desc;
