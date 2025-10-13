@@ -192,3 +192,44 @@ cust_state_province,
 state_sum,
 rank() over (partition by country_id order by state_sum desc) as rank_avg
 from state_sum;
+
+
+
+--27. Find customers whose credit limit is above the 90th percentile of their income level. 
+
+-error
+
+
+--28. Display top 3 and bottom 3 customers per country by credit limit.  
+
+with rank_as as (select cust_id, cust_first_name||' '||cust_last_name as names, country_id,
+rank() over (partition by country_id order by cust_credit_limit asc) as bottom_3,
+rank() over (partition by country_id order by cust_credit_limit desc) as top_3
+from sh.customers)
+select * from rank_as where bottom_3 <= 3 or top_3 <= 3
+order by country_id;
+
+
+
+--29. Calculate rolling sum of 5 customers’ credit limit within each country.  
+
+select cust_id, cust_first_name||' '||cust_last_name as names, country_id,
+sum(cust_credit_limit) over (partition by country_id order by  cust_id rows between
+4 preceding and current row ) as sum_29
+from sh.customers
+order by country_id, cust_id;
+
+
+--30. For each marital status, display the most and least wealthy customers using analytical functions.  
+
+with rank_as as (
+select cust_id, 
+cust_first_name||' '||cust_last_name as names,
+cust_marital_status,
+cust_credit_limit,
+rank() over (partition by cust_marital_status order by cust_credit_limit asc) as least_wealthy,
+rank() over (partition by cust_marital_status order by cust_credit_limit desc) as most_wealthy
+from sh.customers)
+select * from rank_as where least_wealthy <= 1 or most_wealthy <= 1
+order by cust_marital_status;
+
