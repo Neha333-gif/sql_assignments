@@ -233,3 +233,138 @@ from sh.customers)
 select * from rank_as where least_wealthy <= 1 or most_wealthy <= 1
 order by cust_marital_status;
 
+--🧠 C. Conditional, CASE, and DECODE (10 Questions)
+--1.Categorize customers into income tiers: Platinum, Gold, Silver, Bronze.
+
+select 
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_income_level,
+   case
+    when cust_income_level  like '%: 30%' then 'bronze'
+    when cust_income_level  like '%:50%' or cust_income_level  like '%:70%' then 'silver'
+    when cust_income_level  like '%130%' or cust_income_level  like '%150%' or cust_income_level  like '%170%' then 'gold'
+    else 'platinum'
+    end as income_categories
+    from sh.customers;
+
+--2.Display “High”, “Medium”, or “Low” income categories based on credit limit.
+
+select 
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_credit_limit,
+   case
+    when cust_credit_limit > 8000 then 'high'
+    when cust_credit_limit between 3000 and 8000 then 'medium'
+    else 'low'
+    end as income_categories
+    from sh.customers;
+
+--3.Replace NULL income levels with “Unknown” using NVL.
+    
+ select 
+      cust_id,
+      cust_first_name||' '||cust_last_name as names,
+      cust_income_level,
+      nvl(cust_income_level, 'unknown') as income_level
+      from sh.customers ;
+
+
+--4.Show customer details and mark whether they have above-average credit limit or not.
+
+select 
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_credit_limit,
+   case
+    when cust_credit_limit > 6000 then 'above_average'
+    else 'not_above_average'
+    end as credit_categories
+    from sh.customers;
+
+
+--5.Use DECODE to convert marital status codes (S/M/D) into full text.
+
+select
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_marital_status,
+   decode (cust_marital_status,'single','s',
+   'married','m','divorced','d') as marital_status_full
+   from sh.customers;
+
+
+--6.Use CASE to show age group (≤30, 31–50, >50) from CUST_YEAR_OF_BIRTH.
+
+with age_as as 
+(select 
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_year_of_birth,
+   (2025 - cust_year_of_birth) as age
+   from sh.customers)
+   select 
+       cust_id,
+       cust_year_of_birth,
+       age,
+       case
+        when age <= 30 then 'below 30'
+        when age between 31 and 50 then 'between 31 and 50'
+        else 'greater than 50'
+        end as age_status
+        from age_as;
+
+--7.Label customers as “Old Credit Holder” or “New Credit Holder” based on year of birth < 1980.
+
+ select 
+       cust_id,
+       cust_year_of_birth,
+       case
+        when cust_year_of_birth < 1980 then 'old credit holder'
+        else 'new credit holder'
+        end as credit_status
+        from sh.customers;
+
+--8.Create a loyalty tag — “Premium” if credit limit > 50,000 and income_level = ‘E’.
+
+select 
+       cust_id,
+       cust_credit_limit,
+       cust_income_level,
+       case
+        when cust_credit_limit > 7000 and cust_income_level like 'E%' then 'premium'
+        else 'not premium'
+        end as loyalty_tag
+        from sh.customers where cust_income_level like 'E%';
+
+--9.Assign grades (A–F) based on credit limit range using CASE.
+
+   select 
+     cust_id,
+     cust_first_name||' '||cust_last_name as names,
+     cust_credit_limit,
+     case
+       when cust_credit_limit = 1500 then 'A' 
+       when cust_credit_limit = 3000 then 'B'
+       when cust_credit_limit = 7000 then 'C' 
+       when cust_credit_limit = 9000 then 'D'
+       when cust_credit_limit = 11000 then 'E'
+       when cust_credit_limit = 15000 then 'F'
+       else 'null'  
+       end as limit_range
+       from sh.customers;
+
+
+
+--10. Show country, state, and number of premium customers using conditional aggregation.
+   
+   select 
+     country_id,
+     cust_state_province,
+     sum(case when cust_credit_limit > 6000 then 1 else 0 end) as premium_credit_case
+     from sh.customers 
+     group by country_id, cust_state_province
+     order by country_id, cust_state_province;
+  
+
