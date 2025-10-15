@@ -1,0 +1,224 @@
+--💼 Bonus: Scenario-Based SQL on SH.CUSTOMERS
+--1.Display the top 5 customers with the highest credit limit.
+select * from
+(select 
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  rank() over (order by cust_credit_limit desc) as rn 
+  from sh.customers)
+  where rn <= 5;
+
+--2.Find customers having the same income level as the customer with the maximum credit limit.
+
+with credit_avg as
+(select
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_income_level
+  from sh.customers
+  where cust_credit_limit = (select max(cust_credit_limit) from sh.customers))
+  select
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_income_level
+  from sh.customers
+  where cust_income_level in (select cust_income_level from credit_avg);
+
+
+--3.Display customers who have a credit limit higher than the average credit limit of all customers.
+
+select 
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_income_level
+  from sh.customers where cust_credit_limit > (select avg(cust_credit_limit) from sh.customers);
+
+
+--4.Rank all customers based on their credit limit in descending order and display rank along with name.
+
+select
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_credit_limit,
+  rank() over (order by cust_credit_limit desc) as rn
+  from sh.customers;
+
+--5.Find customers who belong to the top 3 credit limit ranks in each income level.
+
+
+select * from
+(select
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_credit_limit,
+  cust_income_level,
+  rank() over (partition by cust_income_level order by cust_credit_limit desc) as rn
+  from sh.customers )
+  where rn <= 3;
+
+--6.Categorize customers into “Platinum”, “Gold”, and “Standard” tiers based on their credit limit ranges.
+
+select
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_credit_limit,
+  case 
+     when cust_credit_limit between 1500 and 5000 then 'standard'
+     when cust_credit_limit between 5001 and 9000 then 'gold'
+     else 'platinum'
+     end as tiers
+     from sh.customers;
+     
+
+--7.Display each customer’s credit limit along with the previous and next customer’s limit (using LAG and LEAD).
+
+select
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_credit_limit,
+  lag(cust_credit_limit) over (order by cust_id ) as previous_limit,
+  lead(cust_credit_limit) over (order by cust_id ) as next_limit
+  from sh.customers;
+  
+
+--8.Find customers whose credit limit difference from the previous customer is more than 10,000.
+
+select * from
+(select
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_credit_limit,
+   lag(cust_credit_limit) over (order by cust_id desc) as previous_limit,
+   cust_credit_limit - lag(cust_credit_limit) over (order by cust_id desc) as diff_btw
+  from sh.customers)
+  where diff_btw > 10000;
+
+--9.Display the highest, lowest, and average credit limit per income level.
+
+select
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   max(cust_credit_limit) over (partition by cust_income_level) as max_limit,
+   min(cust_credit_limit) over (partition by cust_income_level) as min_limit,
+   avg(cust_credit_limit) over (partition by cust_income_level) as avg_limit
+   from sh.customers;
+   
+   
+
+--10.Find the youngest and oldest customers (based on CUST_YEAR_OF_BIRTH).
+
+  select
+   max(cust_year_of_birth) as youngest,
+   min(cust_year_of_birth) as oldest
+   from sh.customers;
+
+--11.Display customers who belong to the same city as the customer “David Lee”.
+
+    with city_af as (select
+    cust_city
+    from sh.customers 
+    where cust_first_name||' '||cust_last_name = 'David Lee')
+    select
+    c.cust_city,
+    c.cust_first_name||' '||c.cust_last_name as names
+    from sh.customers c 
+    join city_af d 
+    on c.cust_city = d.cust_city;
+    
+
+--12.For each state, display the top 2 customers by credit limit.
+
+select * from
+(select
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_state_province,
+   rank() over (partition by cust_state_province order by cust_credit_limit desc) as rn
+   from sh.customers )where rn <= 2;
+
+--13.Show customers whose names start and end with the same letter.
+
+select 
+   cust_first_name||' '||cust_last_name as names
+   from sh.customers
+   where substr(cust_first_name,1,1) = substr(cust_last_name,-1,1);
+
+
+--14.Create a ranking of customers within each country by credit limit.
+
+select * from
+(select
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_credit_limit,
+   rank() over (partition by country_id order by cust_credit_limit desc) as rn
+   from sh.customers )
+   where rn <= 2;
+
+--15.Find customers whose credit limit is below the minimum of their income category.
+
+select
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  cust_credit_limit,
+  cust_income_level
+  from sh.customers c 
+  where cust_credit_limit < (select min(cust_credit_limit) 
+  from sh.customers cd
+  where cd.cust_income_level = c.cust_income_level);
+  
+    
+    
+--16.Display the percentage contribution of each customer’s credit limit compared to total credit limit of their country.
+
+select
+     cust_id,
+     country_id,
+     cust_credit_limit,
+     sum(cust_credit_limit) over (partition by country_id) as sum_credit,
+     round(((cust_credit_limit*100)/sum(cust_credit_limit) over (partition by country_id)),2) as percentage_per_credit 
+     from sh.customers;
+     
+
+--17.Split customers into 4 quartiles (Q1–Q4) based on their credit limit using NTILE(4).
+
+select
+    cust_id,
+    cust_first_name||' '||cust_last_name as names,
+    ntile(4) over (order by cust_credit_limit desc) as rn
+    from sh.customers;
+
+--18.Display customers whose last name has more than 7 characters and income level is “E: 90,000–109,999”.
+
+select
+    cust_id,
+    cust_first_name||' '||cust_last_name as names
+    from sh.customers 
+    where length(cust_last_name) > 7 and  substr(cust_income_level,1,1) = 'E';
+
+--19.For each marital status, find the customer with the maximum credit limit.
+
+select * from
+(select
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_marital_status,
+   rank() over (partition by cust_marital_status order by cust_credit_limit desc) as rn
+   from sh.customers)
+   where rn = 1;
+
+--20.Identify customers whose credit limit equals the department average of their state (using analytical average).
+
+select * from
+     (select
+     cust_id,
+     cust_first_name||' '||cust_last_name as names,
+     cust_credit_limit,
+     avg(cust_credit_limit) over (partition by cust_state_province) as rn
+     from sh.customers)
+     where cust_credit_limit = rn;
+
+
+
+
+
