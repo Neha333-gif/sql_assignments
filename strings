@@ -1,0 +1,78 @@
+ --E. String Functions (10 Questions)
+--1.Show customers whose first and last name start with the same letter.
+select
+ cust_id,
+ cust_first_name||' '||cust_last_name as names
+ from sh.customers 
+ where substr(cust_first_name,1,1) = substr(cust_last_name,1,1);
+
+--2.Display full names in “Last, First” format.
+
+select cust_id,
+'"'||cust_last_name||','||cust_first_name||'"'
+from sh.customers;
+
+--3.Find customers whose last name ends with 'SON'.
+
+select 
+ cust_id,
+ cust_first_name||' '||cust_last_name as names
+ from sh.customers 
+ where cust_last_name like '%son';
+
+--4.Display length of each customer’s full name.
+
+select 
+cust_id,
+ cust_first_name||''||cust_last_name as names,
+length(cust_first_name||''||cust_last_name) as length_of_name
+from sh.customers;
+
+--5.Replace vowels in customer names with '*'.
+
+select 
+cust_id,
+cust_first_name||''||cust_last_name as names,
+regexp_replace(cust_first_name||''||cust_last_name,'[AEIOUaeiou]','*') as new_names
+from sh.customers;
+
+--6.Show customers whose income level description contains ‘90’.
+
+select 
+cust_id,
+cust_first_name||''||cust_last_name as names,
+cust_income_level
+from sh.customers
+where cust_income_level like '%90%';
+
+
+--7.Display initials of each customer (first letters of first and last name).
+select
+cust_id,
+cust_first_name||' '||cust_last_name as names,
+substr(cust_first_name,1,1) ||' '||substr(cust_last_name,1,1) as initials 
+from sh.customers;
+
+--8.Concatenate city and state to create full address.
+select
+cust_id,
+cust_first_name||' '||cust_last_name as names,
+cust_city,
+cust_state_province,
+cust_city||' '||cust_state_province as full_addresss
+from sh.customers;
+
+--9.Extract numeric value from income level using REGEXP_SUBSTR.
+
+select 
+cust_id,
+cust_first_name||''||cust_last_name as names,
+to_number(regexp_replace(cust_income_level,'\d{1,3}(,\d{3})*') as new_income_level
+from sh.customers; --- error
+
+--10. Count how many customers have a 3-letter first name.
+select 
+cust_id,
+cust_first_name||' '||cust_last_name as names,
+length(cust_first_name) as initial_name
+from sh.customers where length(cust_first_name) = 3;
