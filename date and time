@@ -1,0 +1,118 @@
+--1.Convert CUST_YEAR_OF_BIRTH to age as of today.
+select 
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_year_of_birth,
+   extract(year from sysdate) - cust_year_of_birth as age
+   from sh.customers;
+
+--2.Display all customers born between 1980 and 1990.
+
+select 
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_year_of_birth
+   from sh.customers where cust_year_of_birth between 1980 and 1990;
+
+--3.Format date of birth into “Month YYYY” using TO_CHAR.
+
+select
+    cust_id,
+    cust_first_name||' '||cust_last_name as names,
+    cust_year_of_birth,
+    to_char(to_date(cust_year_of_birth,'YYYY'),'month YYYY') as formated_dob
+    from sh.customers;
+
+--4.Convert income level text (like 'A: Below 30,000') to numeric lower limit.
+
+SELECT 
+    cust_id,
+    cust_first_name || ' ' || cust_last_name AS names,
+    cust_income_level,
+    CASE 
+        WHEN cust_income_level LIKE '%Below%' THEN 0
+        ELSE TO_NUMBER(REGEXP_SUBSTR(cust_income_level, '\d+'))
+    END AS lower_limit
+FROM 
+    sh.customers;
+
+
+--5.Display customer birth decades (e.g., 1960s, 1970s).
+
+select 
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   trunc(cust_year_of_birth/10)*10 || 's' as birth_decade
+   from sh.customers;
+
+
+--6.Show customers grouped by age bracket (10-year intervals).
+select 
+   cust_id,
+   cust_first_name||' '||cust_last_name as names,
+   cust_year_of_birth,
+   case
+    when cust_year_of_birth between 1930 and 1939 then '1930s'
+    when cust_year_of_birth between 1940 and 1949 then '1940s'
+    when cust_year_of_birth between 1950 and 1959 then '1950s'
+    when cust_year_of_birth between 1960 and 1969 then '1960s'
+    when cust_year_of_birth between 1970 and 1979 then '1970s'
+    else 'above 1980s'
+    end as age_group
+    from sh.customers;
+
+    -- or else
+
+    select
+     (trunc(cust_year_of_birth/10)*10) ||'-'||(trunc(cust_year_of_birth/10)*10 + 9 ) as age_limit,
+     count(*) as customers
+     from sh.customers 
+     group by (trunc(cust_year_of_birth/10)*10) ||'-'||(trunc(cust_year_of_birth/10)*10 + 9 )
+     order by  (trunc(cust_year_of_birth/10)*10) ||'-'||(trunc(cust_year_of_birth/10)*10 + 9 );
+
+
+
+--7.Convert country_id to uppercase and state name to lowercase.
+
+select 
+  cust_id,
+  cust_first_name||' '||cust_last_name as names,
+  upper(country_id),
+  lower(cust_state_province)
+  from sh.customers;
+
+
+--8. Show customers where credit limit > average of their birth decade.
+
+with avg_age as (
+select
+cust_id,
+cust_first_name||' '||cust_last_name as names,
+cust_credit_limit,
+cust_year_of_birth,
+(trunc(cust_year_of_birth/10)*10 + (trunc(cust_year_of_birth/10)*10 + 9)) / 2 
+ as avg_birth_decade 
+from sh.customers )
+select 
+cust_id,
+cust_first_name||' '||cust_last_name as names,
+cust_credit_limit,
+cust_year_of_birth
+from avg_age where cust_credit_limit > avg_birth_decade;
+--error
+--9.Convert all numeric credit limits to currency format $999,999.00.
+
+select 
+cust_id,
+cust_credit_limit,
+'$'||cust_credit_limit||'.00' as new_credit_limit
+from sh.customers;
+
+--10.Find customers whose credit limit was NULL and replace with average (using NVL).
+
+select 
+cust_id,
+cust_first_name||' '||cust_last_name as names,
+cust_credit_limit,
+nvl(cust_credit_limit,(select avg(cust_credit_limit)from sh.customers)) as age_avg
+from sh.customers;
