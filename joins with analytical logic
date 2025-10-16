@@ -1,0 +1,210 @@
+--🧩 F. Joins with Analytical Logic (10 Questions)
+--1.Join SH.CUSTOMERS and SH.SALES to find customers with the highest sales totals.
+
+select
+   c.cust_id,
+   c.cust_first_name||' '||c.cust_last_name as names,
+   sum(s.amount_sold) as total_sales 
+   from sh.customers c
+   join sh.sales s
+   on c.cust_id = s.cust_id 
+   group by c.cust_id, c.cust_first_name, c.cust_last_name
+   order by total_sales desc;
+
+
+--2.For each customer, show their total sales amount and their rank within country.
+
+ with cust_as as
+ (select
+    c.cust_id,
+    c.cust_first_name||' '||c.cust_last_name as names,
+    c.country_id,
+    sum(s.amount_sold) as total_sales
+    from sh.customers c
+    join sh.sales s
+    on c.cust_id = s.cust_id 
+    group by c.cust_id, c.cust_first_name, c.cust_last_name, c.country_id)
+    select
+    cust_id,
+    names,
+    total_sales,
+    country_id,
+    rank() over (partition by country_id order by total_sales desc) as rnk
+    from cust_as 
+    order by total_sales desc;
+    
+
+
+--3.Find customers who purchased more than average sales amount of their country.
+
+with avg_as as 
+(select 
+    c.cust_id,
+    c.cust_first_name||' '||c.cust_last_name as names,
+    c.country_id,
+    avg(s.amount_sold) as avg_sales
+    from sh.customers c 
+    join sh.sales s
+    on c.cust_id = s.cust_id
+    group by c.cust_id,  c.cust_first_name, c.cust_last_name, c.country_id)
+    select 
+       s.cust_id,
+       a.names,
+       a.avg_sales
+       from sh.sales s
+       join avg_as a
+       on s.cust_id = a.cust_id
+    where s.amount_sold > a.avg_sales 
+    order by a.avg_sales;
+    
+
+--4.Display top 3 spenders per state.
+
+with top_3 as
+(select
+   c.cust_id,
+   c.cust_first_name||' '||c.cust_last_name as names,
+   c.country_id,
+   c.cust_state_province,
+   sum(s.amount_sold) as total_sales 
+   from sh.customers c
+   join sh.sales s
+   on c.cust_id = s.cust_id
+   group by c.cust_id,c.cust_first_name,
+   c.cust_last_name,c.country_id,c.cust_state_province)
+   select
+   cust_id,
+   names,
+   country_id,
+   total_sales,
+   cust_state_province
+   from
+   (select
+   t.*,
+   rank() over (partition by cust_state_province order by total_sales desc) as rnk 
+   from top_3 t) where rnk <= 3
+   order by cust_state_province, total_sales desc;
+
+
+--5.Rank customers within each country by total sales quantity.
+
+with sum_as as (
+    select 
+       c.cust_id,
+       c.country_id,
+       c.cust_first_name||' '||c.cust_last_name as names,
+       sum(s.amount_sold) as total_quantity 
+       from sh.customers c
+       join sh.sales s 
+       on c.cust_id = s.cust_id 
+       group by c.cust_id, c.country_id, c.cust_first_name, c.cust_last_name 
+)
+select 
+    cust_id,
+    country_id,
+    total_quantity,
+    names,
+    rank() over (partition by country_id order by total_quantity desc) as rank_country
+    from sum_as 
+    order by country_id,rank_country;
+
+--6.Calculate each customer’s contribution percentage to country-level sales.
+
+with country_level as
+(select 
+   c.cust_id,
+   c.country_id,
+   c.cust_first_name||' '||c.cust_last_name as names, 
+   sum(s.amount_sold) as total_sales
+   from sh.customers c
+   join sh.sales s
+   on c.cust_id = s.cust_id 
+   group by c.cust_id, c.country_id, c.cust_first_name, c.cust_last_name )
+   select 
+     cust_id,
+     country_id,
+     total_sales,
+     names,
+     round(((total_sales*100)/sum(total_sales)over()),2) as percent_level
+     from country_level 
+     order by country_id, percent_level;
+
+
+--7.Identify customers whose sales have decreased compared to previous month.
+
+ with previous_month as 
+ (select 
+      c.cust_id,
+      c.cust_first_name||' '||c.cust_last_name as names,
+      to_char(s.time_id,'YYYY-MM') as sale_month,
+      sum(s.amount_sold) as total_sales 
+      from sh.customers c
+      join sh.sales s 
+      on c.cust_id = s.cust_id 
+      group by c.cust_id, c.cust_first_name, c.cust_last_name, to_char(s.time_id,'YYYY-MM')),
+      sales_as_previous as 
+      (
+      select 
+      cust_id,
+      names,
+      total_sales,
+      sale_month,
+      lag(total_sales) over (partition by cust_id order by sale_month desc) as prev_month_sales
+      from previous_month)
+      select 
+      cust_id,
+      names,
+      sale_month,
+      total_sales,
+      prev_month_sales
+      from sales_as_previous
+      where total_sales < prev_month_sales
+      order by cust_id, sale_month;
+
+
+--8.Show customers who have never made a sale.
+select 
+  c.cust_id,
+  c.cust_first_name||' '||c.cust_last_name as names
+  from sh.customers c
+  left join sh.sales s
+  on c.cust_id = s.cust_id
+  where s.amount_sold is null;
+
+--9.Find correlation between credit limit and total sales (using GROUP BY + analytics).
+
+with corr_btw as 
+(select 
+   c.cust_id, 
+   c.cust_credit_limit,
+   sum(s.amount_sold) as sum_sold 
+   from sh.customers c
+   join sh.sales s
+   on c.cust_id = s.cust_id 
+   group by c.cust_id, c.cust_credit_limit 
+   )
+   select 
+   corr(cust_credit_limit, sum_sold) as rel_btw 
+   from corr_btw;
+
+--10.Show moving average of monthly sales per customer.
+
+with previous_month as 
+ (select 
+      c.cust_id,
+      c.cust_first_name||' '||c.cust_last_name as names,
+      to_char(s.time_id,'YYYY-MM') as sale_month,
+      sum(s.amount_sold) as total_sales 
+      from sh.customers c
+      join sh.sales s 
+      on c.cust_id = s.cust_id 
+      group by c.cust_id, c.cust_first_name, c.cust_last_name, to_char(s.time_id,'YYYY-MM'))
+      select 
+      cust_id,
+      names,
+      sale_month,
+      total_sales,
+      round(avg(total_sales)over (partition by cust_id order by sale_month rows between
+      2 preceding and current row),2) as monthly_avg
+      from previous_month
+      order by cust_id, sale_month;
