@@ -1,0 +1,585 @@
+
+--## 🧮 A. Basic Functions (1–10)
+
+--1️⃣ Create a function to return total AMOUNT_SOLD for a given SALES_ID.  
+--➡️ `get_sales_amount(p_sales_id NUMBER) RETURN NUMBER`
+
+create or replace function get_sales_amount(p_sales_id number)
+return number 
+is 
+v_amnt_sold number;
+begin 
+    select 
+    amount_sold into v_amnt_sold 
+    from sh.sales 
+    where p_sales_id = sales_id;
+    return v_amnt_sold;
+end;
+/
+
+
+--2️⃣ Create a function to return total AMOUNT_SOLD for a specific PROD_ID.  
+--➡️ `get_total_sales_by_product(p_prod_id NUMBER)`
+
+create or replace function get_total_sales_by_product(p_prod_id number)
+return number 
+is 
+v_amnt_sold number;
+begin
+    select 
+    sum(amount_sold) into v_amnt_sold 
+    from sh.sales 
+    where p_prod_id = prod_id;
+    return v_amnt_sold;
+end;
+/
+
+
+--3️⃣ Create a function to return number of transactions for a given CUST_ID.  
+--➡️ `get_transaction_count(p_cust_id NUMBER)`
+
+create or replace function get_transaction_count(p_cust_id number)
+return number 
+is 
+v_trn_cnt number;
+begin
+    select 
+    count(*) into v_trn_cnt 
+    from sh.sales 
+    where p_cust_id = cust_id;
+    return  v_trn_cnt;
+end;
+/
+
+
+
+--4️⃣ Create a function to return total QUANTITY_SOLD for a given PROMO_ID.  
+--➡️ `get_promo_quantity(p_promo_id NUMBER)`
+
+create or replace function get_promo_quantity(p_promo_id number)
+return number
+is 
+v_qty number;
+begin
+    select 
+    sum(quantity_sold) into v_qty
+    from sh.sales 
+    where promo_id = p_promo_id;
+    return v_qty;
+end;
+/
+
+
+--5️⃣ Create a function to calculate AMOUNT_SOLD per unit (amount / quantity) for a SALES_ID.  
+--➡️ `get_amount_per_unit(p_sales_id NUMBER)`
+
+create or replace function get_amount_per_unit(p_sales_id number)
+return number 
+is 
+v_qty number; v_amnt number;
+begin
+    select 
+    quantity_sold, amount_sold
+    into v_qty,v_amnt
+    from sh.sales 
+    where sales_id = p_sales_id;
+    return v_qty/v_amnt;
+end;
+/
+
+ 
+--6️⃣ Create a function to check if a sale is 'HIGH VALUE' (>1000) or 'NORMAL'.  
+--➡️ `check_sale_value(p_sales_id NUMBER)`
+
+create or replace function check_sale_value (p_sales_id number)
+return varchar2
+is 
+return v_amnt;
+begin
+    select 
+    amount_sold into v_amnt 
+    from sh.sales
+    where sales_id = p_sales_id;
+    if v_amnt > 1000 
+    then
+    v_status := 'high value';
+    else 
+    v_status := 'normal';
+    end if;
+    return v_status;
+end;
+/
+
+
+--7️⃣ Create a function to return average AMOUNT_SOLD across all sales.  
+--➡️ `get_avg_sale_amount()`
+
+create or replace function get_avg_sale_amount()
+return number 
+is 
+v_amnt number;
+begin
+    select
+    avg(amount_sold) into v_amnt
+    from sh.sales;
+    return v_amnt;
+end;
+/
+
+
+--8️⃣ Create a function to return maximum AMOUNT_SOLD value.  
+--➡️ `get_max_sale_amount()`
+
+create or replace function get_max_sale_amount()
+return number 
+is
+v_max number;
+begin
+    select
+    max(amount_sold) into v_max
+    from sh.sales;
+    return v_max;
+end;
+/
+
+
+--9️⃣ Create a function to return the CHANNEL_ID used for a given SALES_ID.  
+--➡️ `get_channel_by_sale(p_sales_id NUMBER)`
+
+create or replace function get_chanel_by_sale (p_sales_id number)
+return number
+is
+v_chnl_id number;
+begin
+    select
+    channel_id into v_chnl_id
+    from sh.sales
+    where sales_id = p_sales_id;
+    return v_chnl_id;
+    end;
+/
+
+
+--🔟 Create a function to return total QUANTITY_SOLD for a given CHANNEL_ID.  
+--➡️ `get_channel_quantity(p_channel_id NUMBER)`
+
+create or replace function get_channel_quantity (p_channel_id number)
+return number 
+is
+v_qty_sold number;
+begin
+    select 
+    sum(quantity_sold) into v_qty_sold
+    from sh.sales 
+    where channel_id = p_channel_id;
+    return v_qty_sold;
+end;
+/
+
+--## 📊 B. Aggregation & Analysis (11–20)
+
+--11️⃣ Create a function to return total sales amount for a given month (TIME_ID).  
+--➡️ `get_monthly_sales(p_time_id DATE)`
+
+create or replace function get_monthly_sales (p_time_id date)
+return number
+is
+v_total_sales number;
+begin
+    select 
+    sum(amount_sold) into v_total_sales 
+    from employees 
+    where to_char(time_id,'MM') = to_char(p_time_id,'MM');
+    return v_total_sales;
+end;
+/
+
+
+--12️⃣ Create a function to return average QUANTITY_SOLD for a given product.  
+--➡️ `get_avg_quantity_by_product(p_prod_id NUMBER)`
+
+create or replace function get_avg_qty_by_product(p_prod_id number)
+return number
+is 
+v_num number;
+begin
+    select 
+    avg(quantity_sold) into v_num
+    from sh.sales
+    where p_prod_id = prod_id;
+    return v_num;
+end;
+/
+
+
+--13️⃣ Create a function to return total number of customers who purchased a specific product.  
+--➡️ `get_customer_count_by_product(p_prod_id NUMBER)`
+
+create or replace function get_customer_count_by_product(p_prod_id number)
+return number 
+is 
+v_prod_num number;
+begin
+    select 
+    count(distinct cust_id) into v_prod_num
+    from sh.sales s
+    join sh.sales h
+    where p_prod_id = prod_id;
+    return v_prod_num;
+end;
+/ 
+     
+--14️⃣ Create a function to return the product ID with the highest total sales.  
+--➡️ `get_top_product()`
+
+create or replace function get_top_product()
+return number
+is 
+v_prod_id number;
+begin
+    select 
+    prod_id into v_prod_id
+    from
+    (select 
+     prod_id, 
+     sum(amount_sold) as total_sales
+     from sh.sales
+     group by prod_id
+     order by sum(amount_sold)desc)
+     where rownum = 1;
+     return v_prod_id;
+end;
+/
+
+
+--15️⃣ Create a function to return the customer ID who spent the highest amount overall.  
+--➡️ `get_top_customer()`
+
+create or replace function get_top_customer()
+return number
+is
+v_cust number;
+begin
+    select 
+    cust_id into v_cust
+    from 
+    (select 
+    cust_id,
+    amount_sold as amt_sld
+    from sh.sales 
+    group by cust_id 
+    order by amt_sld desc )
+    where rownum = 1;
+    return v_cust;
+end;
+/
+
+--16️⃣ Create a function to return the promo ID that generated the highest total sales.  
+--➡️ `get_best_promo()`
+
+create or replace function get_best_promo()
+return number
+is
+v_pid number;
+begin
+    select 
+    promo_id into v_pid
+    from
+    (select 
+    promo_id,
+    sum(amount_sold) as total_sales
+    from sh.sales
+    group by promo_id
+    order by total_sales desc)
+    where rownum = 1;
+    return v_pid;
+end;
+/
+
+
+--17️⃣ Create a function to return total sales made through a specific CHANNEL_ID.  
+--➡️ `get_sales_by_channel(p_channel_id NUMBER)`
+
+
+create or replace function get_channel_quantity (p_channel_id number)
+return number 
+is
+ v_sold number;
+begin
+    select 
+    count(*) into v_sold -- or sum(amount_sold) -- or sum(quantity_sold)
+    from sh.sales 
+    where channel_id = p_channel_id;
+    return v_sold;
+end;
+/
+
+--18️⃣ Create a function to return the percentage of total sales contributed by a given CHANNEL_ID.  
+--➡️ `get_channel_sales_percentage(p_channel_id NUMBER)`
+create or replace function get_channel_quantity (p_channel_id number)
+return number 
+is
+v_qty_sold number; v_chnl_qty number;
+begin
+    select 
+    sum(quantity_sold) into v_qty_sold
+    from sh.sales;
+    select channel_id,
+    sum(quantity_sold) into v_chnl_qty
+    from sh.sales 
+    where channel_id = p_channel_id;
+    return (v_chnl_qty*100)/(v_qty_sold) ;
+end;
+/
+
+--19️⃣ Create a function to return the total number of transactions on a given date.  
+--➡️ `get_sales_count_by_date(p_time_id DATE)`
+
+create or replace function get_sales_count_by_date(p_time_id date)
+return number 
+is
+ v_sold number;
+begin
+    select 
+    count(*) into v_sold 
+    from sh.sales 
+    where time_id = p_time_id;
+    return v_sold;
+end;
+/
+
+--20️⃣ Create a function to return average sale amount per transaction for a given customer.  
+--➡️ `get_avg_sale_per_customer(p_cust_id NUMBER)`
+
+create or replace function get_avg_sale_per_customer (p_cust_id number)
+return number
+is
+return v_avg number; 
+begin
+    select 
+    avg(amount_sold) into v_avg
+    from sh.sales
+    where p_cust_id = cust_id;
+    return v_avg/v_trans ;
+end;
+/   
+
+
+---
+
+--## 🧠 C. Conditional / Logical Functions (21–25)
+
+--21️⃣ Create a function to check if a product was ever sold (YES/NO).  
+--➡️ `is_product_sold(p_prod_id NUMBER)`
+
+create or replace function is_product_sold (p_prod_id number)
+return varchar2
+is
+return v_sold;
+begin
+    select 
+    prod_id,
+    sum(quantity_sold) into v_sold
+    from sh.sales 
+    where prod_id = p_prod_id;
+    if v_sold > 0 
+    then
+    return 'yes'
+    else
+    return 'no';
+    end if;
+end;
+/
+
+--22️⃣ Create a function to check if a customer availed any promotion.  
+--➡️ `has_customer_used_promo(p_cust_id NUMBER)`
+
+
+create or replace function has_customer_used_promo (p_cust_id number)
+return varchar2
+is
+return v_promo;
+begin
+    select 
+    max(promo_id) into v_promo
+    from sh.sales
+    where cust_id = p_cust_id;
+    if v_promo is null 
+    then return 'not_sold' 
+    else
+    return 'sold';
+    end if;
+end;
+/
+
+--23️⃣ Create a function to categorize sales value:  
+--HIGH (>2000), MEDIUM (1000–2000), LOW (<1000).  
+--➡️ `categorize_sale(p_sales_id NUMBER)`
+
+create or replace function categorize_sale (p_sales_id number)
+return varchar2
+is
+v_sale number;
+begin
+    select 
+    amount_sold into v_sale
+    from sh.sales 
+    where sales_id = p_sales_id;
+
+    if v_sale > 2000 then return 'high';
+    elsif v_sale between 1000 and 2000 then return 'medium';
+    elsif v_sale <1000 then return 'low';
+    else return 'unknown';
+    end if;
+end;
+/
+
+--24️⃣ Create a function to return the difference between a product’s sale and the average sale.  
+--➡️ `get_sale_diff_from_avg(p_prod_id NUMBER)`
+
+create or replace function get_sale_diff_from_avg (p_prod_id number)
+return number
+is 
+v_pro number; v_avg number;
+begin
+    select 
+    prod_id,
+    sum(amount_sols) into v_pro
+    from sh.sales 
+    where p_prod_id = prod_id;
+
+    select 
+    avg(amount_sold) into v_avg
+    from sh.sales;
+
+    return v_avg - v_pro ;
+end;
+/
+
+--25️⃣ Create a function to return “LOYAL” if customer purchased more than 10 times, else “NEW”.  
+--➡️ `get_customer_loyalty(p_cust_id NUMBER)`
+
+create or replace function get_customer_loyalty (p_cust_id number)
+return varchar2 
+is 
+v_count number;
+begin
+    select 
+    count(*) as v_count 
+    from sh.sales s
+    join sh.sales p
+    where s.cust_id = p.cust_id;
+    if v_count > 11 
+    then 
+    return 'loyal' 
+    else 
+    return 'new';
+    return v_count;
+end;
+/
+
+---
+
+--## ⚙️ D. Date / Time & Ranking Functions (26–30)
+
+--26️⃣ Create a function to return total sales made in the last 30 days.  
+--➡️ `get_recent_sales_30days()`
+
+create or replace function get_recent_sales_30days ()
+return number
+is
+return v_sold number := 0;
+begin
+    select nvl((sum(amount_sold)),0)
+    into v_sold
+    from sh.sales
+    where sales_date > sysdate - 30;
+    return v_sold;
+end;
+/
+
+
+--27️⃣ Create a function to return total sales for the current year.  
+--➡️ `get_current_year_sales()`
+
+create or replace function get_recent_sales_30days ()
+return varchar2
+is
+v_year number; v_sold number;
+begin
+    select 
+    extract (year from sysdate) into v_year,
+    sum(amount_sold) into v_sold
+    from sh.sales ;
+end;
+/
+
+--28️⃣ Create a function to rank products by their total sales value (1 = highest).  
+--➡️ `get_product_rank(p_prod_id NUMBER)`
+create or replace function get_product_rank()
+return number
+is
+v_rank number;
+begin
+    select 
+    rank into v_rank
+    from
+    (select 
+    prod_id,
+    rank() over (order by sum(amount_sold) desc) as rank
+    from sh.sales
+    group by prod_id)
+    where prod_id = p_prod_id;
+    return v_rank;
+end;
+/
+
+
+--29️⃣ Create a function to return the first sale date for a given product.  
+--➡️ `get_first_sale_date(p_prod_id NUMBER)`
+
+
+create or replace function get_first_sale_date(p_prod_id number)
+return date 
+is
+return v_date;
+begin
+    select 
+    min(time_id)
+    from sh.sales 
+    where prod_id = p_prod_id;
+    return v_date;
+    end;
+/
+
+--30️⃣ Create a function to return a formatted summary string:  
+--“Product <prod_id> sold <quantity> units worth ₹<amount>”  
+--➡️ `get_sales_summary(p_sales_id NUMBER)`
+
+create or replace function get_sales_summary(p_sales_id number)
+return varchar2
+is
+v_pid number;
+begin
+    select 
+    prod_id , quantity_sold, 
+    amount_sold into v_prod,
+    v_qty, v_amnt
+    from sh.sales 
+    where p_sales_id = sales_id;
+
+    return 'Product'||' '||prod_id
+    ||' '||'sold'||' '||quantity_sold||' '||'units worth ₹'||
+    amount_sold;
+end;
+/
+
+
+
+---
+
+### ✅ Testing Example
+```sql
+SELECT get_sales_amount(101) FROM dual;
+SELECT get_avg_sale_per_customer(205) FROM dual;
+SELECT get_sales_summary(3001) FROM dual;
