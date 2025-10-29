@@ -1,0 +1,1497 @@
+-- ==========================================
+-- 🔹 SECTION A: FUNCTIONS (1–35)
+-- ==========================================
+
+--1. Write a function to return the square of a number.
+create or replace function number_square (p_num number)
+return number 
+is 
+begin
+    return p_num * p_num;
+end;
+/
+
+-- 2. Write a function to return the factorial of a number.
+
+create or replace function fact_num (p_num number)
+return number
+is
+fact number := 1;
+begin
+
+if p_num < 0 then
+ return null;
+ end if;
+
+ for i in 1..p_num loop
+ fact := fact * i;
+ end loop;
+
+ return fact;
+
+end;
+/
+     
+
+--3. Write a function that returns the total salary of all employees.
+
+create or replace function get_salary()
+return number
+is 
+v_total number;
+begin
+    select 
+    sum(salary) into v_total
+    from hr.employees
+    return v_total;
+    end;
+/
+
+--4. Write a function that accepts an employee ID and returns the employee’s name.
+
+create or replace function return_name (p_emp_id number)
+return varchar2
+is
+v_name varchar2;
+begin
+    select 
+    cust_first_name||' '||cust_last_name as names
+    from hr.employees 
+    where emp_id = p_emp_id;
+    return v_name;
+    end;
+/
+
+--5. Write a function that returns the department name for a given department ID.
+
+create or replace function get_dept_name (p_dept_id number)
+return varchar2 
+is
+v_dept_name varchar2;
+begin
+    select 
+    department_name into v_dept_name
+    from hr.departments 
+    where department_id = p_dept_id;
+    return v_dept_name;
+    end;
+/
+
+--6. Write a function to check whether a number is even or odd.
+
+create or replace function odd_even (p_num number)
+return varchar2
+is
+begin
+    if (p_num%2 == 0) then return 'even';
+    else return 'odd';
+    end;
+/
+ 
+--7. Write a function that returns the current date and time.
+
+create or replace function return_date ()
+return date
+is
+begin
+    return to_char(sysdate, 'DD-MON-YYYY HH24:MI:SS');
+end;
+/
+
+
+--8. Write a function to calculate the area of a circle given the radius.
+
+create or replace function area_circle (p_radius number)
+return number
+is 
+begin
+    return 3.14*p_radius*p_radius;
+end;
+/
+
+
+--9. Write a function that returns the number of employees in a specific department.
+
+create or replace function num_dept (p_dept_id number)
+return number
+is
+v_count number;
+begin
+    select 
+    count(*) as v_count 
+    from hr.departments 
+    where department_id = p_dept_id;
+    return v_count;
+end;
+/
+
+--10. Write a function to return the maximum salary from the EMP table.
+
+create or replace function max_emp ()
+return number 
+is
+v_max number;
+begin
+    max(salary) as v_max
+    from hr.employees ;
+    return v_max;
+end;
+/
+
+
+--11. Write a function to convert Celsius to Fahrenheit.
+
+create or replace function cel_to_farenheit(p_celcius num)
+return number
+is 
+begin
+    return ((p_celcius * (9/5))+32) || 'F';
+end;
+/
+
+
+--12. Write a function to return the commission percentage of an employee.
+
+create or replace function return_com_pct (p_emp_id number)
+return number
+is
+begin
+    select 
+     commission_pct into v_com_pct
+     from hr.employees 
+     where p_emp_id = emp_id;
+     return v_com_pct;
+    end;
+    /
+
+
+--13. Write a function to count how many employees have a salary above 5000.
+
+create or replace function num_emp()
+return number 
+is
+begin
+    count(*) as emp_num 
+    from hr.employees 
+    where salary > 5000;
+    return emp_num;
+end;
+/ 
+
+--14. Write a function to find the nth Fibonacci number.
+
+create or replace function fib_func(p_num number)
+return number 
+is 
+v_fibb number;
+begin
+    if p_num is 0 then return 0;
+    elsif p_num is 1 then return 1;
+    else return fib_func(p_num-1) + fib_func(p_num-2);
+end;
+/
+
+--15. Write a function that accepts a string and returns it in reverse.
+
+create or replace function get_rev (p_string varchar2)
+return varchar2
+is
+begin
+    return reverse(p_string);
+end;
+/
+
+
+--16. Write a function to return the length of a given string without using LENGTH().
+
+create or replace function get_length (p_string varchar2)
+return number
+is
+begin 
+    if p_string is null
+    then return null;
+    end if;
+
+    for i in 1..n loop
+    begin
+        substr(p_str,i,1);
+        v_count := v_count + 1;
+    exception
+    when value_error then exit;
+    end;
+end loop;
+end;
+/
+
+    
+--17. Write a function to calculate compound interest.
+
+create or replace function comp_int (
+    p_principal number,
+    p_rate number,
+    p_time number,
+    p_n in number default 1
+);
+
+return number 
+is
+v_amount number; v_ci number;
+begin
+    v_amount := p_principal * power ((1+(p_rate/p_n)),(p_n*p_time));
+    v_ci := v_amount - v_principal;
+end;
+/
+
+
+--18. Write a function that returns the employee’s yearly salary.
+
+create or replace function emp_sal(p_salary number)
+return 
+is
+begin
+    return (p_salary*12 - (p_salary*0.10))
+end;
+/
+
+--19. Write a function that returns the minimum salary of a department.
+
+create or replace function min_sal(p_dept_id number)
+return number
+is
+begin
+    select 
+    dept_id,
+    min(salary) into v_min
+    from hr.employees
+    where p_dept_id = department_id;
+    return v_min;
+end;
+/
+
+--20. Write a function that checks whether a given year is a leap year.
+
+create or replace function leap_year (p_year year)
+return varchar2
+is
+begin
+    if to_char(p_year,'days') > 365
+    then return 'leap_year';
+    else return 'not a leap year';
+    end if;
+end;
+/
+
+--21. Write a function that counts the vowels in a string.
+
+create or replace function vowel_string (p_string varchar2)
+return number
+is
+begin
+    if p_string is null 
+     then return 'null';
+    end if;
+
+    for i is 1..n
+    substr(p_string,i,1)
+    if( i = 'a' or i = 'e' or i = 'i' or i = 'o' or i = 'u')
+    then v_count := v_count + 1;
+    return v_count;
+end;
+/
+
+--22. Write a function that returns the greater of two numbers.
+
+create or replace function great(p_num1 number, p_num2 number)
+return varchar2
+is
+begin
+    if p_num1 > p_num2 
+    then return 'p_num1 is greater than p_num2';
+    else
+    return 'p_num1 is less than p_num2';
+    end if;
+end;
+/
+
+--23. Write a function to return the total number of departments.
+
+create or replace function func_name()
+return number
+is
+begin
+    count(*) into dept_num
+    from sh.departments;
+    return dept_num;
+end;
+/
+
+--24. Write a function that returns the last hired employee name.
+
+create or replace function func_name()
+return varchar2 
+is
+begin
+    select 
+    first_name||' '||last_name into v_name
+    from (select max(hire_date)
+    from sh.employees)
+    from sh.employees;
+    return v_name;
+end;
+/
+
+--25. Write a function to return the employee name in uppercase.
+
+create or replace function func_name(p_name varchar2)
+return varchar2
+is
+begin
+    return upper(p_name);
+end;
+/
+
+--26. Write a function that returns the grade (‘A’, ‘B’, ‘C’) based on salary.
+
+create or replace a function func_name(p_salary number)
+return varchar2
+is
+begin
+    if p_salary < 10000 
+    then return 'C';
+    elsif p_salary between 10000 and 30000
+    then return 'B';
+    else return 'A';
+    end if;
+end;
+/
+
+--27. Write a function to find the sum of digits of a given number.
+
+create or replace function add_digits(p_num number)
+return number
+is
+p_mod number := 0;
+p_rem number;
+p_num number;
+begin
+while v_num > 0 loop
+p_rem = mod (p_num,10);
+p_mod := p_mod + p_rem;
+p_num :=trunc(p_num/10);
+end loop;
+
+return p_mod;
+
+end;
+/
+
+--28. Write a function that returns the square root of a number.
+
+create or replace function sq_root(p_num number)
+return number
+is
+
+low number := 0;
+high number := p_num;
+mid number;
+
+ begin
+    if p_num < 0
+    then return null;
+    end if;
+
+    for i in 1..20
+      mid = ((high+low)/2);
+
+    if((mid * mid) > p_num)
+    then high := mid;
+    else low:= mid;
+    end if;
+
+    end loop
+
+end;
+/
+
+--29. Write a function to count employees joined in a given year.
+
+create or replace function func_name(hiredate_p date)
+return number 
+is
+begin
+    extract (year from hiredate_p) into v_year,
+    count(*) into v_num
+    from hr.employees;
+    return v_num;
+end;
+/
+
+--30. Write a function to return the job title of an employee ID.
+create or replace function func_name(p_emp_id number)
+return varchar2 
+is
+begin
+    select 
+    job_id into v_title 
+    from hr.employees 
+    where p_emp_id = emp_id;
+    return v_title;
+end;
+/
+
+--31. Write a function that accepts two numbers and returns their average.
+
+create or replace function func_name(p_num1, p_num2)
+return number 
+is
+begin
+    return (p_num1+p_num2)/2 ;
+end;
+/
+
+--32. Write a function to check if a string is a palindrome.
+create or replace function func_name(p_string varchar2)
+return varchar2
+is
+begin
+    if(p_string == reverse(p_string))
+    then return 'its a palindrome';
+    else return 'its not a palindrome';
+    end if;
+end;
+/
+
+--33. Write a function to return the number of days between two given dates.
+
+create or replace function func_name(p_date1 date, p_date2 date)
+return number 
+is
+return v_diff;
+begin
+    v_diff := abs(p_date1 - p_date2);
+    return v_diff;
+end;
+/
+    
+
+--34. Write a function to return the email ID domain part (after ‘@’) of a string.
+
+// using instr
+
+create or replace function func_name(p_email varchar2)
+return varchar2
+is
+begin
+    pos = instr(p_email,'@');
+    return substr(p_email, pos + 1);
+end;
+/
+    
+--35. Write a function that returns “HIGH”, “MEDIUM”, or “LOW” based on salary range.
+
+create or replace a function func_name(p_salary number)
+return varchar2
+is
+begin
+    if p_salary < 10000 
+    then return 'low';
+    elsif p_salary between 10000 and 30000
+    then return 'medium';
+    else return 'high';
+    end if;
+end;
+/
+
+-- ==========================================
+-- ⚙️ SECTION B: PROCEDURES (36–70)
+-- ==========================================
+
+--36. Write a procedure to insert a new employee record.
+
+create or replace procedure proc_name (
+    p_emp_id in employees.employee_id%type,
+    p_first_name in employees.first_name%type,
+    p_last_name in employees.last_name%type,
+    p_email in employees.email%type,
+    p_phone_number in employees.phone_number%type,
+    p_hire_date in employees.hire_date%type,
+    p_job_id in employees.job_id%type,
+    p_salary in employees.salary%type,
+    p_commission_pct in employees.commission_pct%type,
+    p_manager_id in employees.manager_id%type,
+    p_department_id in employees.department_id%type
+)
+
+is
+begin
+
+    insert into employees (employee_id, first_name, last_name, email, phone_number,
+    hire_date, job_id, salary, commission_pct, manager_id, department_id )
+    values (p_emp_id, p_first_name, p_last_name, p_email, p_phone_number, 
+    p_hire_date, p_job_id, p_salary, p_commission_pct, p_manager_id, p_department_id);
+
+    dbms_output.put_line('employee data successfully inserted');
+end;
+/
+
+--37. Write a procedure to update an employee’s salary.
+
+create or replace procedure proc_name( 
+    p_emp_id in employees.employee_id%type,
+    p_emp_salary in employees.salary%type )
+is
+begin
+    update employees 
+    set salary = p_emp_salary
+    where employee_id = p_emp_id;
+  
+   if sql%rowcount = 0 then
+   dbms_output.put_line('no rows to insert data');
+   else
+   dbms_output.put_line('data successfully inserted');
+   end if;
+end;
+/
+
+--38. Write a procedure to delete an employee by ID.
+
+create or replace procedure proc_name(
+    p_emp_id employees.employee_id%type
+)
+is
+begin
+
+    delete from employees 
+    where p_emp_id = emp_id;
+
+end;
+/
+
+
+--39. Write a procedure that prints all employee names.
+
+create or replace procedure give_names()
+is
+begin
+    
+    dbms_output.put_line('employee names');
+    dbms_output.put_line('--------------');
+
+  for emp_rec in (select first_name||' '||last_name as names 
+  from sh.employees)
+  loop
+    dbms_output.put_line(emp_rec.names);
+  end loop;
+  end;
+  /
+
+--40. Write a procedure that accepts an employee ID and prints their details.
+
+create or replace procedure print_detail(
+    emp_id employees.employee_id%type)
+is
+begin
+     v_first_name employees.first_name%type;
+     v_last_name employees.last_name%type;
+     v_email employees.email%type;
+
+     select first_name, last_name, email 
+     into v_first_name, v_last_name, v_email
+     from sh.employees
+     where emp_id = employee_id;
+
+     dbms_output.put_line('emp_id :'||emp_id);
+     dbms_output.put_line('name :'||v_first_name||' '||v_last_name);
+     dbms_output.put_line('email :'||v_email);
+    end;
+    /
+
+--41. Write a procedure to give a 10% salary hike to all employees in a given department.
+
+create or replace procedure sal_hike()
+is
+ v_count number := 0;
+begin
+    
+    dbms_output.put_line('salary');
+    dbms_output.put_line('------');
+
+    for emp_rec in (select salary from sh.employees)
+    
+    loop 
+        dbms_output.put_line ((emp_rec.salary)+(emp_rec.salary*0.10));
+        v_count := v_count + 1;
+    end loop;
+
+    if v_count = 0 then
+    dbms_output.put_line('no employees in department');
+    end if;
+
+    exception 
+     when others then
+     dbms_output.put_file('other error found');
+
+end;
+/
+
+--42. Write a procedure that increases salary by a percentage given as input.
+
+create or replace procedure inc_percent( v_percent number);
+is
+begin
+    
+    dbms_output.put_line('salary');
+
+    update employees
+    set salary = salary + (salary*(v_percent/100));
+    commit;
+
+    dbms_output.put_line(salary);
+
+    exception
+    when others then
+    dbms_output.put_line('error');
+end;
+/   
+
+--43. Write a procedure to copy data from one table to another.
+
+create or replace procedure copy_data()
+is
+begin
+    dbms_output.put_line('copying date to another table');
+
+    insert into employee_backup
+    select * from employees;
+
+    commit;
+
+    exception
+    when others then
+    dbms_output.put_line('error');
+end;
+/
+
+--44. Write a procedure that deletes all employees with salary less than 3000.
+create or replace procedure del_emp ()
+is
+begin
+    delete from employees
+    where salary < 3000;
+    
+    commit;
+
+    dbms_output.put_line('salary below 3000 deleted');
+
+    exception
+    when others then
+    dbms_output.put_line('error');
+end;
+/
+
+--45. Write a procedure to display total salary per department.
+
+create or replace procedure tot_sal()
+is
+begin
+    for rec_num in (
+    select department_id,
+    sum(salary) as sum_as
+    from sh.employees
+    group by department_id)
+
+loop
+    dbms_output.put_line(rec_num.department_id || ' ' || rec_num.sum_as);
+end loop;
+end;
+/
+
+--46. Write a procedure to log the count of rows in a table.
+
+create or replace procedure log_count ()
+is
+begin
+    select
+     count(*) into v_count from employees;
+
+     insert into log_table(table_name, row_number, date)
+     values ('log_table',v_count,sysdate);
+
+     commit;
+    end;
+/
+
+--47. Write a procedure that accepts a department name and returns its ID via OUT parameter.
+
+create or replace procedure dept_proc (
+    dept_name in departments.department_name%type,
+    dept_id out departments.department_id%type)
+
+is
+begin
+    select
+    department_id 
+    from sh.departments
+    where department_name = dept_name;
+
+    dbms_output.put_line(department_id || ': '|| department_name);
+
+    commit;
+end;
+/
+
+--48. Write a procedure that truncates a specific table dynamically.
+
+create or replace proc_name(emp_table in varchar2)
+is
+begin
+    execute immeadiate 'table_executed'||emp_table;
+    dbms_output.put_line('table'||emp_table||'executed');
+end;
+/
+    
+--49. Write a procedure to display employees whose name starts with ‘A’.
+
+create or replace procedure name_a()
+is 
+begin
+   for trunc_table
+   (select first_name||' '||last_name as names
+    from sh.employees
+    where first_name like 'A%')
+
+loop
+    dbms_output.put_line (trunc_table.names);
+end loop;
+end;
+/
+
+--50. Write a procedure that fetches the highest-paid employee.
+
+create or replace procedure proc_name()
+is
+begin
+    select * from 
+    (select
+    employee_id into v_id,
+    rank() over (order by salary desc) as rn
+    from sh.employees)
+    where rn = 1;
+
+    dbms_output.put_line(v_id || 'is highest paid employee');
+end;
+/
+
+--51. Write a procedure that updates job title based on salary range.
+create or replace procedure proc_name(p_salary number)
+is
+begin
+     update employees
+     set job_id = 'it_prog'
+     where salary > 40000;
+
+     update employees
+     set job_id = 'ad_pres'
+     where salary <40000;
+    
+    commit;
+end;
+/
+
+--52. Write a procedure to insert multiple records using a loop.
+
+create or replace procedure proc_name()
+is
+begin
+    loop
+        insert into employees(employee_id, employees_salary)
+        values (i||'id', i*10000 );
+    end loop;
+end;
+/
+
+--53. Write a procedure to print all department names.
+
+ create or replace procedure print_all ()
+ is
+ begin
+    for rec in (select department_name from departmets)
+    loop
+        dbms_output.put_line(rec.department_name);
+    end loop;
+end;
+/
+
+--54. Write a procedure to find employees without commission.
+
+create or replace procedure proc_name()
+is
+begin
+    for rec in (
+        select first_name||' '||last_name into v_name
+        from sh.employees
+        where commission_pct is null)
+   loop
+    dbms_output.put_line(v_name);
+   end loop;
+end;
+/
+
+--55. Write a procedure that accepts two dates and shows employees hired in between.
+
+create or replace procedure proc_name(date1 date, date2 date)
+is
+begin
+    for rec in(
+    select
+    first_name||' '||last_name into v_name
+    from sh.employees
+    where hire_date between date1 and date2)
+    loop
+        dbms_output.put_line(v_name);
+    end loop;
+end;
+/
+
+
+--56. Write a procedure that transfers employees from one department to another.
+
+create or replace transfer (dept_id1 number, dept_id2 number)
+is
+begin
+
+    update employees
+    set department_id = dept_id2 
+    where department_id = dept_id1;
+
+    commit;
+
+end;
+/
+--57. Write a procedure that logs audit data in a separate table.
+
+create or replace procedure tab()
+is
+begin
+    select 
+    count(*) as v_count
+    from sh.employees;
+
+    insert into (row_num, table_date)
+    values (v_count, sysdate);
+
+end;
+/
+
+--58. Write a procedure to delete duplicate employee records.
+
+create or replace procedures duplicate()
+is
+begin
+    delete from employees e
+    join employees d
+    where 
+
+--59. Write a procedure to print even numbers from 1 to 50.
+
+create or replace procedure proc_name()
+is
+begin
+    for i in 1..50 loop
+        if (i%2 == 0)
+        then dbms_output.put_line(i);
+    end loop;
+end;
+/
+    
+--60. Write a procedure that generates Fibonacci series up to N terms.
+
+create or replace procedure fib_series (n number)
+is
+declare 
+a number := 0;
+b number := 1;
+c number;
+
+begin
+     if n = 0
+     then return null;
+     else if n = 1
+     then return 1;
+     else
+     for i in 3..n loop
+     c := a + b;
+     a := b;
+     b := c;
+     end loop;
+     end if;
+end;
+/
+
+--61. Write a procedure that reverses a given string.
+    
+    create or replace procedure rev(p_string varchar2)
+    is
+    v_reverse varchar2(100):= '';
+    begin
+        for i in reverse 1..length(p_string) loop
+            v_reverse := v_reverse || substr(p_string,i,1);
+        end loop;
+
+     dbms_output.put_line(v_reverse);
+    
+    end;
+    /
+--62. Write a procedure to print all prime numbers between 1 and 100.
+
+   create or replace procedure proc_name()
+   is
+   v_count number;
+   begin
+
+    for p_num in 3..99 loop
+      for i in 2..p_num loop
+      if mod(p_num,i)=0 then
+      v_count := v_count + 1;
+      end if;
+      end loop;
+
+      if (v_count > 1)
+      then     
+      dbms_output.put_line('p_num a prime number');
+      end if;
+    end loop;
+    end;
+    /
+
+--63. Write a procedure to calculate and print the factorial of a given number.
+
+ create or replace procedure fact_num(p_num number)
+ is
+  v_fact := 1;
+ begin
+     for i in 1..p_num loop
+     v_fact := v_fact * 1;
+     end loop;
+     dbms_output.put_line(v_fact);
+ end;
+ /
+
+
+--64. Write a procedure that accepts a table name and prints row count dynamically.
+
+  create or replace procedure tab_name()
+  is
+  begin
+    select 
+    count(*) 
+  dbms_output.put_line()
+
+
+--65. Write a procedure to find employees with NULL manager IDs.
+
+create or replace procedure proc_name()
+is
+begin
+    for rec_num in (
+    select
+    first_name||' '||last_name as name
+    from sh.employees 
+    where manager_id is null)
+
+    loop 
+        dbms_output.put_line(rec_num.name);
+    end loop;
+end;
+/
+
+
+--66. Write a procedure to update salaries of all employees hired before 2010.
+
+create or replace procedure proc_name()
+is
+begin
+    update sh.employees
+    set salary = salary * 2
+    where (extract (year from hire_date)) < 2010;
+
+    commit;
+
+end;
+/
+
+--67. Write a procedure to delete rows older than 30 days from a log table.
+
+  create or replace procedure proc_name()
+  is
+  begin
+    delete from log_table 
+    where hire_date < sysdate - 30;
+    commit;
+   end;
+ /
+
+--68. Write a procedure that accepts an employee ID and displays their department and job.
+
+    create or replace procedure proc_name(
+    p_emp_id employees.employee_id%type )
+    is
+    begin
+        for rec_num in (
+        select
+        department_id, job_id 
+        into v_id, v_job_id
+        from sh.employees 
+        where employee_id = p_emp_id)
+
+        commit;
+
+        dbms_output.put_line(rec_num.vid, rec_num.v_job_id);
+
+    end;
+    /
+
+
+--69. Write a procedure that inserts today’s date and username into a log table.
+  
+    create or replace procedure proc_name()
+    is 
+    begin
+      insert into log_table(todays_date,username)
+      values (sysdate, user);
+    end;
+    /
+
+--70. Write a procedure that prints the number of days in the current month.
+
+create or replace procedure proc_name()
+is 
+v_days number;
+begin
+    v_days := to_number(to_char(last_day(sysdate,'DD'));
+end;
+/
+
+    -- ==========================================
+-- 🔥 SECTION C: TRIGGERS (71–100)
+-- ==========================================
+
+--71. Write a BEFORE INSERT trigger on EMP table to automatically set CREATED_DATE = SYSDATE.
+
+create or replace trigger trigg1
+before insert on employees
+for each row
+begin
+    :new.created_date := sysdate;
+end;
+/
+
+--72. Write an AFTER INSERT trigger to log new records into an AUDIT table.
+
+create or replace trigger trigg2
+after insert on employees
+for each row
+begin
+    insert into (emp_id, emp_name, emp_date)
+    values (:new.emp_id, :new.emp_name, sysdate);
+end;
+/
+
+--73. Write a BEFORE UPDATE trigger to prevent salary reduction.
+
+create or replace trigger sal_red
+before update on employees
+for each row
+begin
+    if :new.salary < :old.salary
+    then raise_application_error('salary reduction not allowed');
+    end if;
+end;
+/
+
+--74. Write an AFTER DELETE trigger to record deleted rows in another table.
+
+create table order_audit(
+    emp_id number,
+    emp_name varchar2 );
+
+create or replace trigger rec_num 
+after delete on employees
+for each row
+begin
+    insert into order_audit (emp_id, emp_name) values (:old.emp_id, :old.emp_name);
+end;
+/
+--75. Write a BEFORE INSERT trigger to assign an employee ID from a sequence.
+
+    create sequence seq 
+    start with 101 
+    increment by 1;
+
+create or replace trigger rec_num 
+before insert on employees 
+for each row 
+begin
+    if :new.employee_id is null
+    then :new_employee_id := seq.nextval;
+end;
+/
+
+
+--76. Write an AFTER UPDATE trigger to log old and new salary values.
+ -- create table salary_audit
+create or replace trigger rec_num 
+after update on employees 
+for each row 
+begin
+    insert into salary_audit (emp_id_old, emp_id_new, emp_name_new, emp_name_old)
+    values (:old.emp_id, new.emp_id, :new.emp_name, :old.emp_name);
+end;
+/
+
+--77. Write a BEFORE DELETE trigger to prevent deletion of managers.
+
+create or replace trigger rec_num 
+before delete on employees
+for each row 
+begin
+    if :old.job_title = 'manager'
+    then raise_error_application('cannot delete managers');
+end;
+/
+--78. Write a trigger that prevents updates on weekends.
+
+create or replace trigger rec_num 
+before update on employees
+for each row
+begin
+    if to_char(sysdate,'DY')in ('sat' , 'sun')
+    then raise_error_application('cannot update on weekends');
+end;
+/
+--79. Write a trigger to set LAST_UPDATED_BY = USER on update.
+
+create or replace trigger rec_num 
+after update on employees 
+for each row 
+begin
+    :new.last_updated_by := user;
+end;
+/
+
+--80. Write a trigger to prevent insertion of duplicate email IDs.
+
+create or replace trigger rec_num 
+before insert on employees 
+for each row 
+begin
+    if :new.emp_id = :old.emp_id 
+    then raise_error_application('error of duplicate emp_id');
+end;
+/
+
+--81. Write a trigger that calculates annual salary after each salary update.
+
+create or replace trigger rec_num 
+after update on employees 
+for each row 
+begin 
+    :new.annual_salary := :new.salary * 12;
+end;
+/
+
+--82. Write a trigger to allow inserts only during office hours (9–5).
+
+create or replace trigger rec_num 
+before insert on employees 
+for each row 
+declare v_hour;
+begin
+    v_hour := to_number(to_char(sysdate,'HH24')) ;
+
+    if v_hour < 9 or v_hour > 17 
+    then raise_error_application('error - beyond office hours');
+
+end;
+/
+
+--83. Write a trigger that logs login attempts in a LOGIN_LOG table.
+-- create a login_log table which has login_attempt_id of type number
+create sequence seq 
+start with 1
+increment by 1;
+
+
+create or replace trigger rec_num 
+after insert on employees 
+for each row 
+declare v_login;
+begin
+   
+   insert into login_log(login_attempt_id)
+   values (seq.nextval);
+
+end;
+/
+
+--84. Write a trigger that sets DEFAULT department to ‘GENERAL’ if NULL.
+
+create or replace trigger rec_num 
+before insert on employees 
+for each row 
+declare v_hour;
+begin
+    
+    if :new.department_name is null
+     then  :new.department_name = 'general';
+    end if;
+
+end;
+/
+
+--85. Write a trigger that prevents deletion of rows from the DEPARTMENT table.
+
+create or replace trigger rec_num 
+before delete on employees 
+for each row 
+declare v_hour;
+begin
+    
+     then  raise_application_error('cannot delete rows')
+
+end;
+/
+
+--86. Write a trigger to prevent updating the primary key of EMP.
+
+create or replace trigger rec_num 
+before update of emp_id on employees 
+for each row 
+begin
+    
+raise_application_error('cannot delete primary key');
+
+end;
+
+--or
+
+
+create or replace trigger rec_num 
+before update  on employees 
+for each row 
+begin
+    
+if :old.emp_id <> :new.emp_id then
+raise_application_error('cannot delete primary key');
+end if;
+
+end;
+/
+
+--87. Write a trigger that updates audit columns (UPDATED_BY, UPDATED_ON) automatically.
+
+create or replace trigger rec_num 
+before update on employees 
+for each row 
+begin
+    
+:new.updated_by := user;
+:new.updated_on := sysdate;
+
+end;
+/
+
+--88. Write a trigger that restricts inserting records if total count exceeds 1000.
+
+create or replace trigger rec_num 
+before insert on employees 
+for each row 
+declare 
+v_count number;
+begin
+
+select count(*) into v_count from employees;
+
+if v_count > 1000
+then raise_error_application('no more records can be inserted');
+end if;
+
+end;
+/
+
+--89. Write a trigger that fires when a table is truncated.
+
+create or replace trigger rec_num 
+after truncated on schema
+begin
+
+then raise_error_application('table is being truncated');
+
+end;
+/
+
+--90. Write a trigger to stop inserts if salary > 1,00,000.
+
+create or replace trigger rec_num 
+before insert on employees 
+for each row 
+begin
+    
+if :new.salary > 100000 then
+raise_application_error('salary range exceeded');
+end if;
+
+end;
+/
+
+--91. Write a trigger that automatically populates full name column (first + last name).
+
+create or replace trigger rec_num 
+before insert  on employees 
+for each row 
+begin
+
+:new.full_name = :new.first_name||' '||:new.last_name;
+
+end;
+/
+
+--92. Write a trigger that records the time difference between insert and update.
+
+create or replace trigger rec_num 
+after insert o before update on employees 
+for each row 
+begin
+
+if inserting then
+:new.created_at := sysdate;
+:new.updated_at := null;
+end if;
+
+if updating then
+:new.updated_at := sysdate;
+:new.diff_time := :new.created_at - :new.updated_at;
+end if;
+
+end;
+/
+--93. Write a trigger that prevents inserting rows with NULL email.
+
+create or replace trigger rec_num 
+before insert on employees 
+for each row 
+begin
+    
+if :new.email is null then
+raise_application_error('cannot insert null email');
+end if;
+
+end;
+/
+
+--94. Write a trigger that copies deleted employee data into a HISTORY table.
+
+-- create a history table
+
+create or replace trigger rec_num 
+before delete on employees 
+for each row 
+begin
+    
+    insert into history_table (emp_id, emp_name)
+    values (:old.emp_id, :old.emp_name);
+
+end;
+/
+
+--95. Write a trigger that fires before an UPDATE on DEPT table and raises an error if dept_name changes.
+
+create or replace trigger rec_num 
+before update on employees 
+for each row 
+begin
+    
+if :new.department_name <> :old.department_name then
+raise_application_error('department_name changed');
+end if;
+
+end;
+/
+
+--96. Write a trigger to maintain a row count in another table after each insert/delete.
+
+create table emp_id (
+    total_rows number
+);
+
+create or replace trigger rec_num 
+after insert or delete on employees 
+for each row 
+declare 
+
+begin
+    after inserting 
+    update employees 
+    set total_rows = total_rows + 1;
+
+    after deleting
+    update employees
+    set total_rows = total_rows + 1;
+end;
+/
+
+--97. Write a trigger that prevents modification of system admin accounts.
+
+create or replace trigger rec_num 
+before update or delete on employees 
+for each row 
+begin
+    
+if :old.job_id := 'admin' then
+raise_application_error('department_name changed');
+
+end;
+/
+
+--98. Write a trigger that sets BONUS = 0 if salary < 5000.
+
+create or replace trigger rec_num 
+before insert or update on employees 
+for each row 
+begin
+    
+if :new.salary < 5000 then
+set :new.bonus = 0;
+end if;
+
+end;
+/
+--99. Write a trigger that logs username and date whenever salary is modified.
+
+create or replace trigger rec_num 
+after update on employees 
+for each row 
+begin
+    
+if :new.salary <> :old.salary then
+insert into emp_id_table (username, present_date)
+values (:old.user_name, sysdate);
+end if;
+
+end;
+/
+
+--100. Write a trigger that disables inserts into EMP table on Sundays.
+
+create or replace trigger rec_num 
+before insert on employees 
+for each row 
+begin
+    
+if to_char(sysdate,'DY') in ('SUN') then 
+raise_application_error ('its an error since action of insert is done on sunday')
+end if;
+
+end;
+/
+
